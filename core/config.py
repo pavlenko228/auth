@@ -18,12 +18,12 @@ class RunConfig(BaseModel):
 
 class ApiV1Prefix(BaseModel):
     prefix: str = "/v1"
+    jwt_auth: str = "/jwt-auth"
+    users: str = "/users"
 
 
 class ApiPrefix(BaseModel):
     prefix: str = "/api"
-    jwt_auth: str = "/jwt-auth"
-    users: str = "/users"
     v1: ApiV1Prefix = ApiV1Prefix()
 
 
