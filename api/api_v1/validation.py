@@ -3,6 +3,8 @@
 #подумать над тем, что нужно возвращать в validate_token_type при ошибке
 
 from fastapi import Depends, HTTPException, Form
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from api_v1.utils import (
@@ -11,8 +13,11 @@ from api_v1.utils import (
     ACCESS_TOKEN_TYPE,
     REFRESH_TOKEN_TYPE,
 )
+from core.models.auth import Auth
+from core.models.db_helper import db_helper
 import utils 
 from core.schemas.user import CreateUser
+
 
 
 def validate_token_type(
@@ -29,10 +34,20 @@ def validate_token_type(
 
 #нужен ли мне вообще этот метод
 users_db = {}  #не забудь обновить 
-def get_user_by_token_sub(payload: dict) -> CreateUser:
-    uuid: str | None = payload.get("sub")
-    if  user := users_db.get(uuid): #это надо преределать, чтобы обращаться к настоящей бд
+async def get_user_by_token_sub(
+        payload: dict,
+        db: AsyncSession= Depends(db_helper.session_getter)
+) -> CreateUser:
+    uuid: str = payload.get("sub")
+
+    query = select(Auth).filter(Auth.uuid == uuid)
+    result = await db.execute(query)
+    
+    user = result.scalars().first()
+
+    if user:
         return user
+    
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="token invalid (user not found)",
@@ -78,20 +93,27 @@ def get_current_active_auth_user(
     )
 
 
-def validate_auth_user(
+async def validate_auth_user(
     email: str = Form(),
     password: str = Form(),
-):
+    db: AsyncSession = Depends(db_helper.session_getter),
+) -> CreateUser:
     unauthed_exc = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="invalid username or password",
     )
-    if not (user := users_db.get(email)):
+    
+    query = select(Auth).filter(Auth.email == email)
+    result = await db.execute(query)
+    
+    user = result.scalars().first()
+
+    if not user:
         raise unauthed_exc
 
     if not utils.validate_password(
         password=password,
-        hashed_password=user.password,
+        hashed_password=user.hashed_password,
     ):
         raise unauthed_exc
     return user
