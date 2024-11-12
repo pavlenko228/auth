@@ -6,6 +6,9 @@
 #!!!!!!create_access_token продумать, что приходит в функцию
 from datetime import datetime, timedelta
 
+from jwt import InvalidTokenError
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 import bcrypt
 import jwt
 
@@ -72,8 +75,7 @@ def create_jwt(
 
 def create_access_token(user: CreateUser) -> str:
     jwt_payload = {
-        "sub": user.username,
-        "username": user.username,
+        "sub": user.uuid,
         "email": user.email,
     }
     return create_jwt(
@@ -85,13 +87,34 @@ def create_access_token(user: CreateUser) -> str:
 
 def create_refresh_token(user: CreateUser) -> str:
     jwt_payload = {
-        "sub": user.username,
+        "sub": user.uuid,
+        "email": user.email,
     }
     return create_jwt(
         token_type=REFRESH_TOKEN_TYPE,
         token_data=jwt_payload,
         expire_timedelta=timedelta(days=settings.auth_jwt.refresh_token_expire_days),
     )
+
+
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="/api/v1/jwt-auth/login/",
+)
+
+
+def get_current_token_payload(
+    token: str = Depends(oauth2_scheme),
+) -> dict:
+    try:
+        payload = decode_jwt(
+            token=token,
+        )
+    except InvalidTokenError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"invalid token error: {e}",
+        )
+    return payload
 
 
 def hash_password(
