@@ -1,4 +1,4 @@
-from typing import Literal
+from pathlib import Path
 
 from pydantic import BaseModel
 from pydantic import PostgresDsn
@@ -6,6 +6,10 @@ from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
 )
+
+
+BASE_DIR = Path(__file__).parent
+
 
 class RunConfig(BaseModel):
     host: str = "0.0.0.0"
@@ -29,6 +33,14 @@ class DatabaseConfig(BaseModel):
     echo_pool: bool = False
     pool_size: int = 50
     max_overflow: int = 10
+
+
+class AuthJWT(BaseModel):
+    private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem"
+    public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
+    algorithm: str = "RS256"
+    access_token_expire_minutes: int = 15
+    refresh_token_expire_days: int = 30
 
 
 class Settings(BaseSettings):
