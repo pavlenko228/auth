@@ -18,6 +18,8 @@ class ApiV1Prefix(BaseModel):
 
 class ApiPrefix(BaseModel):
     prefix: str = "/api"
+    jwt_auth: str = "/jwt_auth"
+    users: str = "/users"
     v1: ApiV1Prefix = ApiV1Prefix()
 
 
