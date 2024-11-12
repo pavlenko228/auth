@@ -10,4 +10,4 @@ class User(Base):
 
     uuid: Mapped[str] = mapped_column(String, unique=True, primary_key=True) #default=str(uuid.uuid4())
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    hashed_password: Mapped[str] = mapped_column(nullable=False)
