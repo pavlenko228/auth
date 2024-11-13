@@ -15,7 +15,7 @@ from api.api_v1.utils import (
 )
 from core.models.auth import Auth
 from core.models.db_helper import db_helper
-import api.api_v1.utils 
+import api.api_v1.utils as utils
 from core.schemas.user import CreateUser
 
 
