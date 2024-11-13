@@ -45,7 +45,8 @@ class AuthJWT(BaseModel):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=(".env.template", ".env"),
+        env_file = (str(Path(__file__).resolve().parent.parent / '.env.template'),
+                     str(Path(__file__).resolve().parent.parent / '.env')),
         case_sensitive=False,
         env_nested_delimiter="__",
         env_prefix="APP_CONFIG__",
