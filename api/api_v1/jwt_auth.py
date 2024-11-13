@@ -10,12 +10,12 @@ from fastapi.security import (
 )
 from core.schemas.jwt import TokenInfo
 
-from api_v1.utils import (
+from api.api_v1.utils import (
     get_current_token_payload,
     create_access_token,
     create_refresh_token,
 )
-from api_v1.validation import (
+from api.api_v1.validation import (
     get_current_auth_user_for_refresh,
     get_current_active_auth_user,
     validate_auth_user,

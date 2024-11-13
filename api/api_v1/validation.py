@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from api_v1.utils import (
+from api.api_v1.utils import (
     get_current_token_payload,
     TOKEN_TYPE_FIELD,
     ACCESS_TOKEN_TYPE,
@@ -15,7 +15,7 @@ from api_v1.utils import (
 )
 from core.models.auth import Auth
 from core.models.db_helper import db_helper
-import utils 
+import api.api_v1.utils 
 from core.schemas.user import CreateUser
 
 
