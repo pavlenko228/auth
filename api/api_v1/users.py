@@ -9,7 +9,7 @@ from api.api_v1.utils import create_access_token, create_refresh_token, hash_pas
 from core.config import settings
 from core.models import db_helper
 from core.models.auth import Auth
-from core.schemas import UserCreate
+from core.schemas.user import CreateUser
 from core.schemas.jwt import TokenInfo
 
 http_bearer = HTTPBearer(auto_error=False)
@@ -22,7 +22,7 @@ router = APIRouter(
 
 @router.post("/create_user", response_model=TokenInfo)
 async def create_user(
-    user: UserCreate,
+    user: CreateUser,
     db: AsyncSession = Depends(db_helper.session_getter)
 ):
     user_uuid = str(uuid.uuid4())
